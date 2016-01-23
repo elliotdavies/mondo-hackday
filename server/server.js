@@ -83,20 +83,38 @@ function handleAuthCallback(url, res) {
     },
     function(err, response, body){
       if (err) console.log('ERROR: ' + err);
-      // Store the access token we get back in Firebase
       else {
         body = JSON.parse(body);
-        let newUser = firebaseUsers.push();
-        newUser.set({
-          id: body.user_id,
-          access_token: body.access_token
-        });
 
-        // Redirect the user to another page
-        res.writeHead(302, {
-          'Location': '/registered'
-        });
-        res.end();
+        // Fetch the user's account ID
+        request.get(
+          'https://api.getmondo.co.uk/accounts',
+          {
+            'auth': {
+              'bearer': body.access_token
+            }
+          },
+          function(err, acc_res, acc_body) {
+            acc_body = (JSON.parse(acc_body)).accounts[0];
+
+            let newUser = firebaseUsers.push();
+            newUser.set({
+              id: body.user_id,
+              access_token: body.access_token,
+              account: {
+                account_id: acc_body.id,
+                account_no: acc_body.account_number,
+                desc: acc_body.description
+              }
+            });
+
+            // Redirect the user to another page
+            res.writeHead(302, {
+              'Location': '/registered'
+            });
+            res.end();
+          }
+        );
       }
     });
   }
@@ -113,19 +131,24 @@ function handleRegistration(res) {
 }
 
 
+/**
+ * Incoming webhooks
+ */
+function handleWebhook(args) {
+  console.log('Received webhook data:', args);
+}
+
+
 // The server to run
 let server = http.createServer(function(req, res){
   console.log('Received request via ' + req.method);
 
+  // Turn the URL into an object
+  let url = url_lib.parse(req.url);
+
   // GET for e.g. auth requests
   if (req.method === 'GET') {
-    
-    // Turn the URL into an object
-    let url = url_lib.parse(req.url);
-
-    // Where did the user visit?
     switch (url.pathname) {
-
       // Initial auth request
       case '/auth/':
       case '/auth':
@@ -139,28 +162,34 @@ let server = http.createServer(function(req, res){
       case '/registered':
         handleRegistration(res);
         break;
-      case '/webhook':
-        // Something here
-        break;
       // Just ignore this
       case '/favicon.ico':
         break;
       // Default
       default:
-        console.log(`No action found for URL ${url.pathname}`);
+        console.log(`No action found for URL ${url.pathname} via GET`);
         break;
     }
   }
   // POST for e.g. transaction notifications
   else if (req.method === 'POST') {
+    // Wait for all the data
     let data = '';
-
     req.on('data', (chunk) => { data += chunk.toString(); });
     req.on('end', function(){
       let args = parseArgs(data);
       
-      // Do some stuff
-      console.log(data, args)
+      // Then redirect
+      switch (url.pathname) {
+        // Incoming webhooks
+        case '/webhook':
+          handleWebhook(args);
+          break;
+        // Default
+        default:
+          console.log(`No action found for URL ${url.pathname} via POST`);
+          break;
+      }
     });
 
   }
