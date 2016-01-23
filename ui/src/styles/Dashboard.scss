@@ -38,4 +38,43 @@
 
   }
 
+  .dashboard__data {
+    display: flex;
+    justify-content: space-between;
+
+    .dashboard__card {
+      width: 35%;
+
+      &.dashboard__card--chart {
+        width: 60%;
+        margin-right: 5%;
+      }
+    }
+  }
+
+  .dashboard__transactions {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+
+    &:before {
+      content: 'Recent transactions';
+      position: absolute;
+      top: -20px;
+      right: 0;
+      width: 100%;
+      height: 30px;
+      text-align: right;
+      text-transform: uppercase;
+      font-size: 0.8em;
+    }
+
+    li {
+       background: rgba(255, 255, 255, 0.6);
+       padding: 10px;
+       margin: 0 0 0.4em;
+    }
+  }
+
 }

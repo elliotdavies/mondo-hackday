@@ -4,6 +4,7 @@ require('styles/App.css');
 // Libraries
 import React from 'react';
 import { Link } from 'react-router';
+import FontAwesome from 'react-fontawesome';
 
 // Styles
 require('styles//Main.scss');
@@ -50,17 +51,29 @@ class AppComponent extends React.Component {
   }*/
 
   render() {
+    let authed;
+    if(window.localStorage.getItem('auth')) {
+      let userData = JSON.parse(window.localStorage.getItem('auth'));
+      authed = (<li className="nav__item nav__item--text">
+          Welcome back, {userData.name}
+        </li>);
+    }
     return (
       <div className="main">
         <header className="header">
           <h1>TeamCash</h1>
 
           <ul className="nav">
-            <li>
-              <Link to="dashboard">Dashboard</Link>
+            {authed}
+            <li className="nav__item">
+              <Link to="dashboard">
+                <FontAwesome name="dashboard" /> Dashboard
+              </Link>
             </li>
-            <li>
-              <a href="https://github.com/elliotdavies/mondo-hackday">GitHub</a>
+            <li className="nav__item">
+              <a href="https://github.com/elliotdavies/mondo-hackday">
+                <FontAwesome name="github" /> GitHub
+              </a>
             </li>
           </ul>
 

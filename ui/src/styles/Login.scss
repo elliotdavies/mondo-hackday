@@ -1,3 +1,20 @@
 .login-component {
-  border: 1px dashed #f00;
+
+  text-align: center;
+
+  img {
+    max-width: 250px;
+    height: auto;
+    margin: 1em 0 0 0;
+  }
+
+  h1 {
+    margin: 1em 0;
+  }
+
+  h4 {
+    color: #6a6a6a;
+    margin: 0 0 1em;
+  }
+
 }
