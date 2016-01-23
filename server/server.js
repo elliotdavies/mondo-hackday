@@ -1,16 +1,26 @@
 'use strict';
 
+// Node HTTP libs
 const http = require('http');
 const url_lib = require('url');
 const request = require('request');
 
+// Keys and secrets
 const auth = require('./auth.json');
 const client_id = auth.client_id;
 const client_secret = auth.client_secret
 
+// Firebase database
+const Firebase = require("firebase");
+const firebase = new Firebase('https://incandescent-torch-8885.firebaseio.com/');
+const firebaseUsers = firebase.child('users');
+const firebaseTransactions = firebase.child('transactions');
+
+// Server config
 const port = 8080;
 const path = '0.0.0.0';
 
+// Mondo auth
 const state = 'stategoeshere';
 const redirect_uri = `http://${path}:${port}/auth/callback`;
 const mondo_auth_url = `https://auth.getmondo.co.uk/?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code&state=${state}`;
@@ -76,9 +86,15 @@ let server = http.createServer(function(req, res){
           },
           function(err, res, body){
             if (err) console.log('ERROR: ' + err);
-            else console.log('Finally received ' + body);
-
             // Do something with the access token we get back
+            else {
+              body = JSON.parse(body);
+              let newUser = firebaseUsers.push();
+              newUser.set({
+                id: body.user_id,
+                access_token: body.access_token
+              });
+            }
           });
         }
         break;
