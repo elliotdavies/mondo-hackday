@@ -1,3 +1,34 @@
 .user-component {
-  border: 1px dashed #f00;
+
+  header {
+    display: flex;
+
+    img {
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: 50%;
+      margin: 0 1em 0 0;
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+
+    }
+
+    .buttons {
+      margin-top: auto;
+      align-self: flex-start;
+    }
+  }
+
+  .user__transactions {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
 }

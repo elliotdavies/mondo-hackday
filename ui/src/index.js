@@ -6,6 +6,7 @@ import { Router, Route } from 'react-router';
 // Components
 import App from './components/Main';
 import User from './components/UserComponent';
+import Auth from './components/AuthComponent';
 import Login from './components/LoginComponent';
 import Dashboard from './components/DashboardComponent';
 import NoMatch from './components/ErrorComponent';
@@ -16,6 +17,7 @@ import NoMatch from './components/ErrorComponent';
 render((
   <Router>
     <Route path="/" component={App}>
+      <Route path="auth/:user" component={Auth}/>
       <Route path="login" component={Login}/>
       <Route path="dashboard" component={Dashboard}/>
       <Route name="user" path="user/:id" component={User}/>

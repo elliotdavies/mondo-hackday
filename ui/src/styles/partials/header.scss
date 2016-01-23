@@ -18,6 +18,10 @@ header.header {
       letter-spacing: normal;
       display: inline-block;
 
+      &.nav__item--text {
+        padding: 20px;
+      }
+
       a {
         display: block;
         text-align: center;

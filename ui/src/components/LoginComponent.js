@@ -2,13 +2,19 @@
 
 import React from 'react';
 
+let mondoLoginImage = require('../images/mondo-login.png');
+
 require('styles//Login.scss');
 
 class LoginComponent extends React.Component {
   render() {
     return (
       <div className="login-component">
-        Please edit src/components///LoginComponent.js to update this component!
+        <h1>Join TeamCash</h1>
+        <h4>A smart spending tracker for small teams and businesses, built with Mondo</h4>
+        <a href="http://192.168.42.12:8080/auth">
+          <img src={mondoLoginImage} />
+        </a>
       </div>
     );
   }

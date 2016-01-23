@@ -64,12 +64,15 @@
     "node-sass": "^3.4.2"
   },
   "dependencies": {
+    "chart.js": "^1.0.2",
     "core-js": "^2.0.0",
     "history": "^1.17.0",
     "normalize.css": "^3.0.3",
     "re-base": "^1.5.1",
     "react": "^0.14.0",
+    "react-chartjs": "^0.6.0",
     "react-dom": "^0.14.0",
+    "react-fontawesome": "^0.3.3",
     "react-router": "^1.0.3",
     "reactfire": "^0.5.1"
   }
