@@ -80,20 +80,20 @@ function handleAuthCallback(url, res) {
         code: args.code
       }
     },
-    function(err, response, body){
-      if (err) console.log('ERROR: ' + err);
+    function(authErr, authRes, authBody){
+      if (authErr) console.log('ERROR: ' + authErr);
       else {
-        body = JSON.parse(body);
+        authBody = JSON.parse(authBody);
 
         // Fetch the user's account ID
         request.get(
           'https://api.getmondo.co.uk/accounts',
           {
             'auth': {
-              'bearer': body.access_token
+              'bearer': authBody.access_token
             }
           },
-          function(err, accRes, accBody) {
+          function(accErr, accRes, accBody) {
             accBody = (JSON.parse(accBody)).accounts[0];
 
             // Check if user already exists in the database
@@ -103,7 +103,7 @@ function handleAuthCallback(url, res) {
               let matchingUsers = [];
               if (data) {
                 matchingUsers = Object.keys(data).filter(d => {
-                  return data[d].id === body.user_id;
+                  return data[d].id === authBody.user_id;
                 });
               }
 
@@ -111,19 +111,57 @@ function handleAuthCallback(url, res) {
               if (matchingUsers.length === 0) {
                 let newUser = firebaseUsers.push();
                 newUser.set({
-                  id: body.user_id,
-                  access_token: body.access_token,
+                  id: authBody.user_id,
+                  access_token: authBody.access_token,
                   account: {
                     account_id: accBody.id,
                     account_no: accBody.account_number,
                     desc: accBody.description
                   }
                 });
+
+                // Does this user already have a webhook set up?
+                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.account_number,
+                {
+                  'auth': {
+                    'bearer': authBody.access_token
+                  },
+                },
+                function(webhookErr, webhookRes, webhookBody) {
+                  webhookBody = JSON.parse(webhookBody);
+
+                  // If so, do nothing
+                  if (!webhookBody.webhooks) {
+                    console.log('Error checking webhooks');
+                    return;
+                  }
+                  else if (webhookBody.webhooks.length > 0) {
+                    console.log('Webhook already registered for this user');
+                    return;
+                  }
+
+                  // If not, create one
+                  request.post({
+                    url: 'https://api.getmondo.co.uk/webhooks',
+                    'auth': {
+                      'bearer': authBody.access_token
+                    },
+                    form: {
+                      account_id: accBody.id,
+                      url: redirectUriBase + '/webhook'
+                    }
+                  },
+                  function(createWHErr, createWHRes, createWHBody) {
+                    console.log(createWHBody);
+                    if (createWHErr) console.log('Error registering webhook');
+                    else console.log('Webhook registered successfully');
+                  });
+                });
               }
 
-              // Redirect the user to another page
+              // Redirect the user elsewhere
               res.writeHead(302, {
-                'Location': `/#/auth/${body.user_id}`
+                'Location': `/#/auth/${authBody.user_id}`
               });
               res.end();
             })
@@ -136,22 +174,16 @@ function handleAuthCallback(url, res) {
 
 
 /**
- * New user registers
- */
-function handleRegistration(res) {
-  console.log('New user registered!')
-  res.writeHead(200, {'Content-Type':'text/plain'});
-  res.end('Gotcha!\n');
-}
-
-
-/**
  * Incoming webhooks
  */
 function handleWebhook(args) {
   console.log('Received webhook data:', args);
 
-  // Update database on each webhook
+  // Update database on each webhook received
+  // fetchUserIds(ids => {
+  //   updateTotals(ids);
+  //   updateRecentTransactions(ids);
+  // });
 }
 
 

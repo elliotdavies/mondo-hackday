@@ -53,7 +53,7 @@ class DashboardUserComponent extends React.Component {
           <h2>{this.props.user.account.desc}</h2>
           <p>{this.props.user.account_id}</p>
         </div>
-        <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing*-1/100).toFixed(2)}</Link>
+        <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
       </li>
     );
   }
