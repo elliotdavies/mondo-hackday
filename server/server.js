@@ -154,7 +154,7 @@ function fetchUserIds(fn) {
         u_id: data[d].id,
         token: data[d].access_token,
         acc_id: data[d].account.account_id,
-        name: data[d].account.desc
+        name: data[d].name
       }
     });
     fn(ids); // Use callback to access this data elsewhere
@@ -180,14 +180,14 @@ function updateRecentTransactions(ids) {
     },
     function(err, res, body) {
       let transactions = (JSON.parse(body)).transactions;
-      let transactionsWithUid = transactions.map(t => {
+      let transactionsWithMeta = transactions.map(t => {
         return Object.assign(t, {
           name: id.name // Add further details to the transaction object
         });
       });
 
-      transactionsWithUid.forEach(t => teamTransactions.push(t));
-      firebaseRecents.child(id.u_id).set(transactionsWithUid);
+      transactionsWithMeta.forEach(t => teamTransactions.push(t));
+      firebaseRecents.child(id.u_id).set(transactionsWithMeta);
 
       // PLEASE FIX PROPERLY IN FUTURE: This means all async functions have returned
       if (counter-- === 0) {
@@ -204,7 +204,45 @@ function updateRecentTransactions(ids) {
  */
 function updateTotals(ids) {
   console.log('Updating totals');
-  // firebaseTotals
+
+  let counter = ids.length - 1;
+  let totalIncoming = 0;
+  let totalOutgoing = 0;
+
+  let weekAgo = new Date();
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  let weekAgoStr = weekAgo.toISOString();
+
+  ids.forEach(id => {
+    request(`https://api.getmondo.co.uk/transactions?account_id=${id.acc_id}&since=${weekAgoStr}`,
+    {
+      'auth': {
+        'bearer': id.token
+      }
+    },
+    function(err, res, body) {
+      let transactions = (JSON.parse(body)).transactions;
+      
+      let incoming = transactions.filter(t => t.amount >= 0).reduce((total, t) => { return total + t.amount }, 0);
+      let outgoing = transactions.filter(t => t.amount < 0).reduce((total, t) => { return total + t.amount }, 0);
+
+      firebaseTotals.child(id.u_id).set({
+        incoming: incoming, 
+        outgoing: outgoing
+      });
+
+      totalIncoming += incoming;
+      totalOutgoing += outgoing;
+
+      // PLEASE FIX PROPERLY IN FUTURE: This means all async functions have returned
+      if (counter-- === 0) {
+        firebaseTotals.child('team').set({
+          incoming: totalIncoming,
+          outgoing: totalOutgoing
+        });
+      }
+    });
+  });
 }
 
 
