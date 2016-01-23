@@ -7,11 +7,13 @@ import LazyImage from './LazyImageComponent';
 
 require('styles//DashboardUser.scss');
 
+const config = require('json!../../config.json');
+
 // Libraries
 var Rebase = require('re-base');
 
 // Configure Firebase
-var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/');
+var base = Rebase.createClass(config.database);
 
 class DashboardUserComponent extends React.Component {
 

@@ -6,6 +6,8 @@ import DashboardUserComponent from './DashboardUserComponent';
 import RequireAuthComponent from './RequireAuthComponent';
 import DashboardTransactionComponent from './DashboardTransactionComponent';
 
+const config = require('json!../../config.json');
+
 var Chart = require('react-chartjs');
 var BarChart = Chart.Bar;
 
@@ -15,7 +17,7 @@ require('styles//Dashboard.scss');
 var Rebase = require('re-base');
 
 // Configure Firebase
-var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/');
+var base = Rebase.createClass(config.database);
 
 class DashboardComponent extends RequireAuthComponent {
 

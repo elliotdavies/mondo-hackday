@@ -7,9 +7,10 @@ require('styles//RequireAuth.scss');
 
 // Libraries
 var Rebase = require('re-base');
+const config = require('json!../../config.json');
 
 // Configure Firebase
-var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/');
+var base = Rebase.createClass(config.database);
 
 class RequireAuthComponent extends React.Component {
 

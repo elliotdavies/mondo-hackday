@@ -6,21 +6,20 @@ const urlLib = require('url');
 const request = require('request');
 const fs = require('fs');
 
-// Keys and secrets
-const auth = require('./auth.json');
-const clientId = auth.client_id;
-const clientSecret = auth.client_secret
+// Config, keys and secrets
+const config = require('./config.json');
+const clientId = config.client_id;
+const clientSecret = config.client_secret
+const port = config.port;
+const path = config.server;
 
 // Firebase database
 const Firebase = require("firebase");
-const firebase = new Firebase('https://incandescent-torch-8885.firebaseio.com/');
+const firebase = new Firebase(config.database);
 const firebaseUsers = firebase.child('users');
 const firebaseRecents = firebase.child('recent');
 const firebaseTotals = firebase.child('totals');
 
-// Server config
-const port = 8080;
-const path = '0.0.0.0';
 
 // Mondo auth
 const state = 'stategoeshere';
@@ -278,10 +277,6 @@ let server = http.createServer(function(req, res){
       case '/auth/callback':
         handleAuthCallback(url, res);
         break;
-      // New user
-      // case '/registered':
-      //   handleRegistration(res);
-      //   break;
       // Manually force database updates
       case '/update/':
       case '/update':
@@ -301,12 +296,10 @@ let server = http.createServer(function(req, res){
       default:
         fs.stat('dist' + url.pathname, function(err, stat){
           if (err === null) {
-            console.log(url.pathname + ' exists')
             fs.readFile('dist' + url.pathname, function(err, contents){
               res.end(contents);
             });
           }
-          // else console.log(`No action found for URL ${url.pathname} via GET`);
           else console.log(err)
         })
         break;

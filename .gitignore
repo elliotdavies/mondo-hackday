@@ -29,4 +29,4 @@ node_modules
 # Bower
 bower_components/
 
-auth.json
+config.json

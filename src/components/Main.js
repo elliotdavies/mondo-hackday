@@ -8,12 +8,13 @@ import FontAwesome from 'react-fontawesome';
 
 // Styles
 require('styles//Main.scss');
+const config = require('json!../../config.json');
 
 // Libraries
 var Rebase = require('re-base');
 
 // Configure Firebase
-var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/');
+var base = Rebase.createClass(config.database);
 
 class AppComponent extends React.Component {
   constructor(props) {
