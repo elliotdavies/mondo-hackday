@@ -123,7 +123,7 @@ function handleAuthCallback(url, res) {
 
               // Redirect the user to another page
               res.writeHead(302, {
-                'Location': '/registered'
+                'Location': `/#/auth/${body.user_id}`
               });
               res.end();
             })
@@ -268,6 +268,13 @@ let server = http.createServer(function(req, res){
   // GET for e.g. auth requests
   if (req.method === 'GET') {
     switch (url.pathname) {
+      case '/':
+        // Redirect the user to the login page
+        res.writeHead(302, {
+          'Location': '/#/login'
+        });
+        res.end();
+        break;
       // Initial auth request
       case '/auth/':
       case '/auth':
@@ -278,9 +285,9 @@ let server = http.createServer(function(req, res){
         handleAuthCallback(url, res);
         break;
       // New user
-      case '/registered':
-        handleRegistration(res);
-        break;
+      // case '/registered':
+      //   handleRegistration(res);
+      //   break;
       // Manually force database updates
       case '/update/':
       case '/update':
