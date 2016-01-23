@@ -4,6 +4,7 @@
 const http = require('http');
 const urlLib = require('url');
 const request = require('request');
+const fs = require('fs');
 
 // Keys and secrets
 const auth = require('./auth.json');
@@ -234,12 +235,12 @@ function updateTotals(ids) {
     },
     function(err, res, body) {
       let transactions = (JSON.parse(body)).transactions;
-      
+
       let incoming = transactions.filter(t => t.amount >= 0).reduce((total, t) => { return total + t.amount }, 0);
       let outgoing = transactions.filter(t => t.amount < 0).reduce((total, t) => { return total + t.amount }, 0);
 
       firebaseTotals.child(id.u_id).set({
-        incoming: incoming, 
+        incoming: incoming,
         outgoing: abs(outgoing)
       });
 
@@ -268,13 +269,6 @@ let server = http.createServer(function(req, res){
   // GET for e.g. auth requests
   if (req.method === 'GET') {
     switch (url.pathname) {
-      case '/':
-        // Redirect the user to the login page
-        res.writeHead(302, {
-          'Location': '/#/login'
-        });
-        res.end();
-        break;
       // Initial auth request
       case '/auth/':
       case '/auth':
@@ -296,12 +290,25 @@ let server = http.createServer(function(req, res){
           updateRecentTransactions(ids);
         });
         break;
-      // Just ignore this
-      case '/favicon.ico':
-        break;
       // Default
+      case '/':
+        url.pathname = '/index.html';
+        // Redirect the user to the login page
+        // res.writeHead(302, {
+        //   'Location': '/#/login'
+        // });
+        // res.end();
       default:
-        console.log(`No action found for URL ${url.pathname} via GET`);
+        fs.stat('dist' + url.pathname, function(err, stat){
+          if (err === null) {
+            console.log(url.pathname + ' exists')
+            fs.readFile('dist' + url.pathname, function(err, contents){
+              res.end(contents);
+            });
+          }
+          // else console.log(`No action found for URL ${url.pathname} via GET`);
+          else console.log(err)
+        })
         break;
     }
   }
@@ -312,7 +319,7 @@ let server = http.createServer(function(req, res){
     req.on('data', (chunk) => { data += chunk.toString(); });
     req.on('end', function(){
       let args = parseArgs(data);
-      
+
       // Then redirect
       switch (url.pathname) {
         // Incoming webhooks
@@ -328,7 +335,7 @@ let server = http.createServer(function(req, res){
 
   }
   // If we receive anything else
-  else { 
+  else {
     res.writeHead(200, {'Content-Type':'text/plain'});
     res.end('Boo!\n');
   }
