@@ -22,12 +22,12 @@ const path = '0.0.0.0';
 
 // Mondo auth
 const state = 'stategoeshere';
-const redirect_uri = `http://${path}:${port}/auth/callback`;
-const mondo_auth_url = `https://auth.getmondo.co.uk/?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code&state=${state}`;
-const mondo_auth_url2_host = `https://api.getmondo.co.uk/oauth2/token`;
+const redirect_uri_base = `http://${path}:${port}`;
 
 
-// Helper function to parse arguments
+/**
+ * Helper function to parse arguments
+ */
 function parseArgs(data) {
   let args = {}
 
@@ -39,6 +39,77 @@ function parseArgs(data) {
   });
 
   return args;
+}
+
+
+/**
+ * Initial auth request
+ */
+function handleAuth(res) {
+  console.log('User visited /auth - redirecting to Mondo...');
+
+  const mondo_auth_url = `https://auth.getmondo.co.uk/?client_id=${client_id}&redirect_uri=${redirect_uri_base}/auth/callback&response_type=code&state=${state}`;
+
+  res.writeHead(302, {
+    'Location': mondo_auth_url
+  });
+  res.end();
+}
+
+
+/**
+ * Secondary auth request (callback)
+ */
+function handleAuthCallback(url, res) {
+  console.log('Received Mondo auth callback...')
+  let args = parseArgs(url.query);
+
+  // Pretend we're checking the validity of the callback
+  if (args.state === state) {
+    console.log('Redirecting to Mondo again...');
+
+    const mondo_auth_url2_host = 'https://api.getmondo.co.uk/oauth2/token';
+
+    // Fire off data to Mondo
+    request.post({
+      url: mondo_auth_url2_host,
+      form: {
+        grant_type: 'authorization_code',
+        client_id: client_id,
+        client_secret: client_secret,
+        redirect_uri: redirect_uri_base + '/auth/callback',
+        code: args.code
+      }
+    },
+    function(err, response, body){
+      if (err) console.log('ERROR: ' + err);
+      // Store the access token we get back in Firebase
+      else {
+        body = JSON.parse(body);
+        let newUser = firebaseUsers.push();
+        newUser.set({
+          id: body.user_id,
+          access_token: body.access_token
+        });
+
+        // Redirect the user to another page
+        res.writeHead(302, {
+          'Location': '/registered'
+        });
+        res.end();
+      }
+    });
+  }
+}
+
+
+/**
+ * New user registers
+ */
+function handleRegistration(res) {
+  console.log('New user registered!')
+  res.writeHead(200, {'Content-Type':'text/plain'});
+  res.end('Gotcha!\n');
 }
 
 
@@ -58,45 +129,18 @@ let server = http.createServer(function(req, res){
       // Initial auth request
       case '/auth/':
       case '/auth':
-        console.log('User visited /auth - redirecting to Mondo...');
-        res.writeHead(302, {
-          'Location': mondo_auth_url
-        });
-        res.end();
+        handleAuth(res);
         break;
       // Secondary auth request
       case '/auth/callback':
-        console.log('Received Mondo auth callback...')
-        let args = parseArgs(url.query);
-        
-        // Pretend we're checking the validity of the callback
-        if (args.state === state) {
-          console.log('Redirecting to Mondo again...');
-
-          // Fire off data to Mondo
-          request.post({
-            url: mondo_auth_url2_host,
-            form: {
-              grant_type: 'authorization_code',
-              client_id: client_id,
-              client_secret: client_secret,
-              redirect_uri: redirect_uri,
-              code: args.code
-            }
-          },
-          function(err, res, body){
-            if (err) console.log('ERROR: ' + err);
-            // Do something with the access token we get back
-            else {
-              body = JSON.parse(body);
-              let newUser = firebaseUsers.push();
-              newUser.set({
-                id: body.user_id,
-                access_token: body.access_token
-              });
-            }
-          });
-        }
+        handleAuthCallback(url, res);
+        break;
+      // New user
+      case '/registered':
+        handleRegistration(res);
+        break;
+      case '/webhook':
+        // Something here
         break;
       // Just ignore this
       case '/favicon.ico':
@@ -107,10 +151,8 @@ let server = http.createServer(function(req, res){
         break;
     }
   }
-
-
   // POST for e.g. transaction notifications
-  if (req.method === 'POST') {
+  else if (req.method === 'POST') {
     let data = '';
 
     req.on('data', (chunk) => { data += chunk.toString(); });
@@ -122,7 +164,6 @@ let server = http.createServer(function(req, res){
     });
 
   }
-  
   // If we receive anything else
   else { 
     res.writeHead(200, {'Content-Type':'text/plain'});
