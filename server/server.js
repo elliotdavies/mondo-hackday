@@ -48,9 +48,7 @@ function parseArgs(data) {
  */
 function handleAuth(res) {
   console.log('User visited /auth - redirecting to Mondo...');
-
   const mondoAuthUrl = `https://auth.getmondo.co.uk/?client_id=${clientId}&redirect_uri=${redirectUriBase}/auth/callback&response_type=code&state=${state}`;
-
   res.writeHead(302, {
     'Location': mondoAuthUrl
   });
@@ -98,23 +96,37 @@ function handleAuthCallback(url, res) {
           function(err, accRes, accBody) {
             accBody = (JSON.parse(accBody)).accounts[0];
 
-            // Store information in the database
-            let newUser = firebaseUsers.push();
-            newUser.set({
-              id: body.user_id,
-              access_token: body.access_token,
-              account: {
-                account_id: accBody.id,
-                account_no: accBody.account_number,
-                desc: accBody.description
-              }
-            });
+            // Check if user already exists in the database
+            firebaseUsers.once('value', function(data){
+              data = data.val();
 
-            // Redirect the user to another page
-            res.writeHead(302, {
-              'Location': '/registered'
-            });
-            res.end();
+              let matchingUsers = [];
+              if (data) {
+                matchingUsers = Object.keys(data).filter(d => {
+                  return data[d].id === body.user_id;
+                });
+              }
+
+              // Store information in the database if not
+              if (matchingUsers.length === 0) {
+                let newUser = firebaseUsers.push();
+                newUser.set({
+                  id: body.user_id,
+                  access_token: body.access_token,
+                  account: {
+                    account_id: accBody.id,
+                    account_no: accBody.account_number,
+                    desc: accBody.description
+                  }
+                });
+              }
+
+              // Redirect the user to another page
+              res.writeHead(302, {
+                'Location': '/registered'
+              });
+              res.end();
+            })
           }
         );
       }
@@ -228,7 +240,7 @@ function updateTotals(ids) {
 
       firebaseTotals.child(id.u_id).set({
         incoming: incoming, 
-        outgoing: outgoing
+        outgoing: abs(outgoing)
       });
 
       totalIncoming += incoming;
@@ -238,7 +250,7 @@ function updateTotals(ids) {
       if (counter-- === 0) {
         firebaseTotals.child('team').set({
           incoming: totalIncoming,
-          outgoing: totalOutgoing
+          outgoing: abs(totalOutgoing)
         });
       }
     });
