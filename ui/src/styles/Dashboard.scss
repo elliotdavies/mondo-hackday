@@ -1,0 +1,41 @@
+.dashboard-component {
+
+  .dashboard__users {
+    margin: 0;
+    padding: 0;
+    letter-spacing: -4px;
+
+    .dashboard__user {
+      display: flex;
+      letter-spacing: normal;
+      width: 100%;
+      margin: 0 0 1em;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+
+      h2 {
+        display: block;
+        margin: 0 0 0.2em;
+      }
+
+      p {
+        color: #5a5a5a;
+        margin: 0 0 0.2em;
+      }
+
+      img {
+        border-radius: 50%;
+        max-width: 75px;
+        max-height: 75px;
+        margin: 0 0.67em 0 0;
+      }
+
+      .button {
+        margin-left: auto;
+        align-self: flex-start;
+      }
+    }
+
+  }
+
+}

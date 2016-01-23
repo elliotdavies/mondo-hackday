@@ -65,9 +65,12 @@
   },
   "dependencies": {
     "core-js": "^2.0.0",
+    "history": "^1.17.0",
     "normalize.css": "^3.0.3",
+    "re-base": "^1.5.1",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
+    "react-router": "^1.0.3",
     "reactfire": "^0.5.1"
   }
 }

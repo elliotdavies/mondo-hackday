@@ -1,21 +1,72 @@
 /* Base Application Styles */
+
+@import url(https://fonts.googleapis.com/css?family=Alegreya+Sans:400,400italic,700);
+
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+  background:
+    linear-gradient(
+      rgba(167, 233, 154, 0.4),
+      transparent
+    ),
+    linear-gradient(
+      90deg,
+      rgba(173, 136, 205, 0.4),
+      transparent
+    );
+
+  background-blend-mode: screen;
+  background-attachment: fixed;
+}
+
 body {
-  color: #fff;
-  background: #222;
+  margin: 0;
+  padding: 0;
+
+  color: #3a3a3a;
+  font-family: "Alegreya Sans", serif;
 }
 
-.index img {
-  margin: 40px auto;
+a {
+  color: #3a3a3a;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1em;
+}
+
+.button, button {
+  background: #73537b;
+  color: #FFFFFF;
+  padding: 6px 18px;
   border-radius: 4px;
-  background: #fff;
-  display: block;
+  border: 0;
 }
 
-.index .notice {
-  margin: 20px auto;
-  padding: 15px 0;
-  text-align: center;
-  border: 1px solid #000;
-  border-width: 1px 0;
-  background: #666;
+.button:hover, button:hover {
+  background: #583760;
+}
+
+.label {
+  background: #eaeaea;
+  color: #3a3a3a;
+  font-size: 0.8em;
+  padding: 2px 5px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.label.label--negative {
+  background: #8e4445;
+  color: #FFFFFF;
+}
+
+.label.label--positive {
+  background: #8ab185;
+  color: #FFFFFF;
 }
