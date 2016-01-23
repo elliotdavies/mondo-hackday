@@ -80,8 +80,14 @@ button+button {
   background: #8e4445;
   color: #FFFFFF;
 }
+.label.label--negative.label--money:before {
+  content: '- ';
+}
 
 .label.label--positive {
   background: #8ab185;
   color: #FFFFFF;
+}
+.label.label--positive.label--money:before {
+  content: '+ ';
 }

@@ -15,7 +15,7 @@ import NoMatch from './components/ErrorComponent';
 // instead, all you really need is a single root route, you don't need to
 // colocate the entire config).
 render((
-  <Router>
+  <Router onUpdate={() => window.scrollTo(0, 0)}>
     <Route path="/" component={App}>
       <Route path="auth/:user" component={Auth}/>
       <Route path="login" component={Login}/>

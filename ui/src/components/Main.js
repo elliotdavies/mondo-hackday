@@ -18,46 +18,46 @@ var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/')
 class AppComponent extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      users: [],
-      transactions: [],
-      data: {
-        totalSpend: 0
-      }
-    };
   }
 
-  componentDidMount(){
-    base.syncState('users', {
-      context: this,
-      state: 'users',
-      asArray: true
-    });
-
-    base.syncState('transactions', {
-      context: this,
-      state: 'transactions',
-      asArray: true
-    });
+  logout() {
+    window.localStorage.removeItem('auth');
+    window.location.href = '/#/login';
   }
-
-/*  addItem(){
-    let newItem = {name: 'Cheese'};
-
-    this.setState({
-      items: this.state.items.concat([newItem]) //updates Firebase and the local state
-    });
-  }*/
 
   render() {
     let authed;
+    let logout;
+    let dashboard;
+    let login;
+
     if(window.localStorage.getItem('auth')) {
       let userData = JSON.parse(window.localStorage.getItem('auth'));
       authed = (<li className="nav__item nav__item--text">
           Welcome back, {userData.name}
         </li>);
+      logout = (
+        <li className="nav__item">
+          <a onClick={this.logout.bind(this)}>
+            <FontAwesome name="key" /> Logout
+          </a>
+        </li>
+        );
+      dashboard = (
+        <li className="nav__item">
+          <Link to="dashboard">
+            <FontAwesome name="dashboard" /> Dashboard
+          </Link>
+        </li>);
+    } else {
+      login = (
+        <li className="nav__item">
+          <Link to="dashboard">
+            <FontAwesome name="key" /> Login
+          </Link>
+        </li>);
     }
+
     return (
       <div className="main">
         <header className="header">
@@ -65,16 +65,14 @@ class AppComponent extends React.Component {
 
           <ul className="nav">
             {authed}
-            <li className="nav__item">
-              <Link to="dashboard">
-                <FontAwesome name="dashboard" /> Dashboard
-              </Link>
-            </li>
+            {dashboard}
+            {login}
             <li className="nav__item">
               <a href="https://github.com/elliotdavies/mondo-hackday">
                 <FontAwesome name="github" /> GitHub
               </a>
             </li>
+            {logout}
           </ul>
 
         </header>

@@ -4,11 +4,18 @@ import React from 'react';
 
 import DashboardUserComponent from './DashboardUserComponent';
 import RequireAuthComponent from './RequireAuthComponent';
+import DashboardTransactionComponent from './DashboardTransactionComponent';
 
 var Chart = require('react-chartjs');
 var BarChart = Chart.Bar;
 
 require('styles//Dashboard.scss');
+
+// Libraries
+var Rebase = require('re-base');
+
+// Configure Firebase
+var base = Rebase.createClass('https://incandescent-torch-8885.firebaseio.com/');
 
 class DashboardComponent extends RequireAuthComponent {
 
@@ -16,27 +23,37 @@ class DashboardComponent extends RequireAuthComponent {
     super(props);
 
     this.state = {
+      recentTransactions: [],
       averageSpend: 652.23,
-      users: [
-        {
-          id: 1,
-          name: 'Chris Hutchinson',
-          email: 'hello@chrishutchinson.me',
-          avatar: 'https://pbs.twimg.com/profile_images/482607943071039488/vcujIxUA.jpeg',
-          spending: 409.31
-        },
-        {
-          id: 2,
-          name: 'Elliot Davies',
-          email: 'elliot.a.davies@gmail.com',
-          avatar: 'https://pbs.twimg.com/profile_images/378800000573332482/c11b89e52dfc33206372889686a48273.jpeg',
-          spending: 984.19
-        }
-      ]
+      users: []
     }
   }
 
+  componentDidMount() {
+    this.recentBind = base.bindToState('recent/team', {
+      context: this,
+      state: 'recentTransactions',
+      asArray: true,
+      queries: {
+        orderByChild: 'created',
+        limitToLast: 3
+      }
+    });
+
+    this.usersBind = base.bindToState('users', {
+      context: this,
+      state: 'users',
+      asArray: true
+    });
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.recentBind);
+    base.removeBinding(this.usersBind);
+  }
+
   render() {
+
     let chartData = {
         labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         datasets: [
@@ -74,18 +91,9 @@ class DashboardComponent extends RequireAuthComponent {
           </div>
           <div className="dashboard__card">
             <ul className="dashboard__transactions">
-              <li>
-                <h4>Transaction 1 <small>by Chris Hutchinson</small></h4>
-                <span class="label">£12.45</span>
-              </li>
-              <li>
-                <h4>Transaction 2 <small>by Chris Hutchinson</small></h4>
-                <span class="label">£24.45</span>
-              </li>
-              <li>
-                <h4>Transaction 3 <small>by Chris Hutchinson</small></h4>
-                <span class="label">£154.35</span>
-              </li>
+              {this.state.recentTransactions.map(function(transaction, key) {
+                return (<DashboardTransactionComponent transaction={transaction} key={key} />);
+              }.bind(this))}
             </ul>
           </div>
         </div>
