@@ -1,15 +1,16 @@
-var http = require('http');
-var port = 8080;
+const http = require('http');
+const port = 8080;
+const path = '0.0.0.0';
 
 
 // Parse POST body arguments
 function parseArgs(data) {
-  var args = {}
+  let args = {}
 
-  var parts = data.split('&');
-  parts.forEach(function(part, i){
-    var key = part.split('=')[0];
-    var value = part.split('=')[1];
+  let parts = data.split('&');
+  parts.forEach((part, i) => {
+    let key = part.split('=')[0];
+    let value = part.split('=')[1];
     args[key] = decodeURIComponent(value);
   });
 
@@ -18,21 +19,22 @@ function parseArgs(data) {
 
 
 // The server to run
-var server = http.createServer(function(req, res){
+let server = http.createServer(function(req, res){
   console.log('Received request via ' + req.method);
 
   // Slack commands are sent via POST
   if (req.method == 'POST') {
-    var data = '';
+    let data = '';
 
     req.on('data', function(chunk){
       data += chunk.toString();
     });
 
     req.on('end', function(){
-      var args = parseArgs(data);
+      let args = parseArgs(data);
       
       // Do some stuff
+      console.log(data, args)
     });
 
   }
@@ -46,6 +48,6 @@ var server = http.createServer(function(req, res){
 
 
 // Go
-server.listen(port, function(){
-  console.log('Listening on localhost at port ' + port);
+server.listen(port, path, function(){
+  console.log(`Listening on ${path} at port ${port}`);
 });
