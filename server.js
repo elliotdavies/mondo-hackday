@@ -192,6 +192,13 @@ function updateRecentTransactions(ids) {
     },
     function(err, res, body) {
       let transactions = (JSON.parse(body)).transactions;
+
+      if (!transactions) {
+        console.log('Error updating recent transactions:', err);
+        console.log('Tried to use id: ' + id + ' and received data: ' + body);
+        return;
+      }
+
       let transactionsWithMeta = transactions.map(t => {
         return Object.assign(t, {
           name: id.name // Add further details to the transaction object
@@ -235,12 +242,18 @@ function updateTotals(ids) {
     function(err, res, body) {
       let transactions = (JSON.parse(body)).transactions;
 
+      if (!transactions) {
+        console.log('Error updating recent transactions:', err);
+        console.log('Tried to use id: ' + id + ' and received data: ' + body);
+        return;
+      }
+
       let incoming = transactions.filter(t => t.amount >= 0).reduce((total, t) => { return total + t.amount }, 0);
       let outgoing = transactions.filter(t => t.amount < 0).reduce((total, t) => { return total + t.amount }, 0);
 
       firebaseTotals.child(id.u_id).set({
         incoming: incoming,
-        outgoing: abs(outgoing)
+        outgoing: Math.abs(outgoing)
       });
 
       totalIncoming += incoming;
@@ -250,7 +263,7 @@ function updateTotals(ids) {
       if (counter-- === 0) {
         firebaseTotals.child('team').set({
           incoming: totalIncoming,
-          outgoing: abs(totalOutgoing)
+          outgoing: Math.abs(totalOutgoing)
         });
       }
     });
