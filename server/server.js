@@ -2,19 +2,20 @@
 
 // Node HTTP libs
 const http = require('http');
-const url_lib = require('url');
+const urlLib = require('url');
 const request = require('request');
 
 // Keys and secrets
 const auth = require('./auth.json');
-const client_id = auth.client_id;
-const client_secret = auth.client_secret
+const clientId = auth.client_id;
+const clientSecret = auth.client_secret
 
 // Firebase database
 const Firebase = require("firebase");
 const firebase = new Firebase('https://incandescent-torch-8885.firebaseio.com/');
 const firebaseUsers = firebase.child('users');
-const firebaseTransactions = firebase.child('transactions');
+const firebaseRecents = firebase.child('recent');
+const firebaseTotals = firebase.child('totals');
 
 // Server config
 const port = 8080;
@@ -22,7 +23,7 @@ const path = '0.0.0.0';
 
 // Mondo auth
 const state = 'stategoeshere';
-const redirect_uri_base = `http://${path}:${port}`;
+const redirectUriBase = `http://${path}:${port}`;
 
 
 /**
@@ -48,10 +49,10 @@ function parseArgs(data) {
 function handleAuth(res) {
   console.log('User visited /auth - redirecting to Mondo...');
 
-  const mondo_auth_url = `https://auth.getmondo.co.uk/?client_id=${client_id}&redirect_uri=${redirect_uri_base}/auth/callback&response_type=code&state=${state}`;
+  const mondoAuthUrl = `https://auth.getmondo.co.uk/?client_id=${clientId}&redirect_uri=${redirectUriBase}/auth/callback&response_type=code&state=${state}`;
 
   res.writeHead(302, {
-    'Location': mondo_auth_url
+    'Location': mondoAuthUrl
   });
   res.end();
 }
@@ -68,16 +69,16 @@ function handleAuthCallback(url, res) {
   if (args.state === state) {
     console.log('Redirecting to Mondo again...');
 
-    const mondo_auth_url2_host = 'https://api.getmondo.co.uk/oauth2/token';
+    const mondoAuthUrl2Host = 'https://api.getmondo.co.uk/oauth2/token';
 
     // Fire off data to Mondo
     request.post({
-      url: mondo_auth_url2_host,
+      url: mondoAuthUrl2Host,
       form: {
         grant_type: 'authorization_code',
-        client_id: client_id,
-        client_secret: client_secret,
-        redirect_uri: redirect_uri_base + '/auth/callback',
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUriBase + '/auth/callback',
         code: args.code
       }
     },
@@ -94,17 +95,18 @@ function handleAuthCallback(url, res) {
               'bearer': body.access_token
             }
           },
-          function(err, acc_res, acc_body) {
-            acc_body = (JSON.parse(acc_body)).accounts[0];
+          function(err, accRes, accBody) {
+            accBody = (JSON.parse(accBody)).accounts[0];
 
+            // Store information in the database
             let newUser = firebaseUsers.push();
             newUser.set({
               id: body.user_id,
               access_token: body.access_token,
               account: {
-                account_id: acc_body.id,
-                account_no: acc_body.account_number,
-                desc: acc_body.description
+                account_id: accBody.id,
+                account_no: accBody.account_number,
+                desc: accBody.description
               }
             });
 
@@ -136,6 +138,73 @@ function handleRegistration(res) {
  */
 function handleWebhook(args) {
   console.log('Received webhook data:', args);
+
+  // Update database on each webhook
+}
+
+
+/**
+ * Fetch all user IDs currently stored in the database
+ */
+function fetchUserIds(fn) {
+  firebaseUsers.once('value', function(data) {
+    data = data.val();
+    let ids = Object.keys(data).map(d => {
+      return {
+        u_id: data[d].id,
+        token: data[d].access_token,
+        acc_id: data[d].account.account_id,
+        name: data[d].account.desc
+      }
+    });
+    fn(ids); // Use callback to access this data elsewhere
+  });
+}
+
+
+/**
+ * Update the database with the most recent transactions for a team and its users
+ */
+function updateRecentTransactions(ids) {
+  console.log('Updating recent transactions');
+
+  let counter = ids.length - 1;
+  let teamTransactions = [];
+
+  ids.forEach(id => {
+    request(`https://api.getmondo.co.uk/transactions?account_id=${id.acc_id}&limit=10`,
+    {
+      'auth': {
+        'bearer': id.token
+      }
+    },
+    function(err, res, body) {
+      let transactions = (JSON.parse(body)).transactions;
+      let transactionsWithUid = transactions.map(t => {
+        return Object.assign(t, {
+          name: id.name // Add further details to the transaction object
+        });
+      });
+
+      transactionsWithUid.forEach(t => teamTransactions.push(t));
+      firebaseRecents.child(id.u_id).set(transactionsWithUid);
+
+      // PLEASE FIX PROPERLY IN FUTURE: This means all async functions have returned
+      if (counter-- === 0) {
+        let topTen = teamTransactions.sort((a, b) => a.created - b.created).slice(0, 9);
+        firebaseRecents.child('team').set(topTen);
+      }
+    });
+  });
+}
+
+
+/**
+ * Update the database with some total figures for a team and its users
+ */
+function updateTotals(ids) {
+  console.log('Updating totals');
+  // firebaseTotals
 }
 
 
@@ -144,7 +213,7 @@ let server = http.createServer(function(req, res){
   console.log('Received request via ' + req.method);
 
   // Turn the URL into an object
-  let url = url_lib.parse(req.url);
+  let url = urlLib.parse(req.url);
 
   // GET for e.g. auth requests
   if (req.method === 'GET') {
@@ -161,6 +230,14 @@ let server = http.createServer(function(req, res){
       // New user
       case '/registered':
         handleRegistration(res);
+        break;
+      // Manually force database updates
+      case '/update/':
+      case '/update':
+        fetchUserIds(ids => {
+          updateTotals(ids);
+          updateRecentTransactions(ids);
+        });
         break;
       // Just ignore this
       case '/favicon.ico':
