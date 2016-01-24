@@ -22,7 +22,8 @@ class DashboardUserComponent extends React.Component {
 
     this.state = {
       incoming: false,
-      outgoing: false
+      outgoing: false,
+      balance: false
     };
   }
 
@@ -36,6 +37,10 @@ class DashboardUserComponent extends React.Component {
     this.outgoingBind = base.bindToState('totals/' + this.props.user.id + '/outgoing', {
       context: this,
       state: 'outgoing',
+    });
+    this.outgoingBind = base.bindToState('totals/' + this.props.user.id + '/balance', {
+      context: this,
+      state: 'balance',
     });
   }
 
@@ -53,7 +58,7 @@ class DashboardUserComponent extends React.Component {
         </div>
         <div className="user__finances">
           <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
-          <h3>£123.04 remaining</h3>
+          <h3>£{(this.state.balance * 1/100).toFixed(2)} remaining</h3>
         </div>
       </li>
     );
