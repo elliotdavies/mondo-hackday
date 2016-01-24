@@ -1,4 +1,4 @@
-# TeamCash (name TBC)
+# TeamCash
 
 Created by [Elliot Davies](http://www.github.com/elliotdavies) and [Chris Hutchinson](http://www.github.com/chrishutchinson) during [#mondohack III](https://attending.io/events/mondohack-3).
 
