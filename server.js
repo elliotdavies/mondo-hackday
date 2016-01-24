@@ -385,6 +385,6 @@ let server = http.createServer(function(req, res){
 
 
 // Go
-server.listen(port, 'localhost', function(){
+server.listen(port, path, function(){
   console.log(`Listening on ${path} at port ${port}`);
 });
