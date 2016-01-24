@@ -17,7 +17,7 @@ class UserMessageComponent extends RequireAuthComponent {
       transactions: [],
       outgoing: false,
       user: false,
-      error: true
+      error: false
     }
   }
 
@@ -38,6 +38,8 @@ class UserMessageComponent extends RequireAuthComponent {
   }
 
   submitData(event) {
+    event.preventDefault();
+
     let data = {
       title: event.target.title.value,
       message: event.target.message.value,
@@ -51,13 +53,15 @@ class UserMessageComponent extends RequireAuthComponent {
       .post('http://' + config.server + ':' + config.port + '/message')
       .send(data)
       .set('Accept', 'application/json')
-      .set('Content-Type', 'application/json')
       .end(function(err, res){
+        console.error(err, res);
         if(err) {
-          this.state.error = true;
+          this.setState({
+            error: true
+          });
+        } else {
+          window.location.href = '/#/user/' + this.props.params.id;
         }
-
-        window.location.href = '/#/user/' + this.props.params.id;
       }.bind(this));
   }
 
