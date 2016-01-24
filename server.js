@@ -117,11 +117,13 @@ function handleAuthCallback(url, res) {
                     account_id: accBody.id,
                     account_no: accBody.account_number,
                     desc: accBody.description
-                  }
+                  },
+                  name: '',
+                  email: ''
                 });
 
                 // Does this user already have a webhook set up?
-                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.account_number,
+                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.id,
                 {
                   'auth': {
                     'bearer': authBody.access_token
@@ -227,7 +229,7 @@ function updateRecentTransactions(ids) {
 
       if (!transactions) {
         console.log('Error updating recent transactions:', err);
-        console.log('Tried to use id: ' + id + ' and received data: ' + body);
+        console.log('Tried to use id: ' + JSON.stringify(id) + ' and received data: ' + body);
         return;
       }
 
@@ -275,8 +277,8 @@ function updateTotals(ids) {
       let transactions = (JSON.parse(body)).transactions;
 
       if (!transactions) {
-        console.log('Error updating recent transactions:', err);
-        console.log('Tried to use id: ' + id + ' and received data: ' + body);
+        console.log('Error updating total transactions:', err);
+        console.log('Tried to use id: ' + JSON.stringify(id) + ' and received data: ' + body);
         return;
       }
 
