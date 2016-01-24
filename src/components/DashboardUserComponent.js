@@ -22,7 +22,8 @@ class DashboardUserComponent extends React.Component {
 
     this.state = {
       incoming: false,
-      outgoing: false
+      outgoing: false,
+      balance: false
     };
   }
 
@@ -37,6 +38,10 @@ class DashboardUserComponent extends React.Component {
       context: this,
       state: 'outgoing',
     });
+    this.outgoingBind = base.bindToState('totals/' + this.props.user.id + '/balance', {
+      context: this,
+      state: 'balance',
+    });
   }
 
   componentWillUnmount() {
@@ -44,16 +49,17 @@ class DashboardUserComponent extends React.Component {
   }
 
   render() {
-    console.log(this.state.outgoing);
-
     return (
       <li className="dashboard__user">
-        <LazyImage src={this.getGravatar(this.props.user.email, 150)} />
         <div className="user__meta">
+          <LazyImage src={this.getGravatar(this.props.user.email, 150)} />
           <h2>{this.props.user.name}</h2>
           <p>{this.props.user.email}</p>
         </div>
-        <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
+        <div className="user__finances">
+          <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
+          <h3>£{(this.state.balance * 1/100).toFixed(2)} remaining</h3>
+        </div>
       </li>
     );
   }

@@ -216,10 +216,10 @@ function handleMessage(res, data) {
         type: 'basic',
         'params[title]': data.title,
         'params[body]': data.message,
-        // 'params[background_color]': '#FCF1EE',
+        'params[background_color]': '#e6f1e6',
         // 'params[body_color]': '#FFFFFF",
         // 'params[title_color]': '#333',
-        'params[image_url]': 'http://www.nyan.cat/cats/original.gif'
+        'params[image_url]': 'http://i.imgur.com/yxhLTcn.png'
       }
     },
     function(err, MondoRes, MondoData){

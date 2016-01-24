@@ -98,6 +98,21 @@ blockquote, .blockquote {
   padding: 0.5em 0 0.5em 1em;
 }
 
+.alert {
+  width: 100%;
+  height: 40px;
+  line-height: 40px;
+  background: #eaeaea;
+  color: #3a3a3a;
+  border-radius: 5px;
+  padding: 0px 10px;
+}
+
+.alert.alert--danger {
+  background: #994141;
+  color: #FFFFFF;
+}
+
 .icon {
   display: inline-block;
   float: left;
