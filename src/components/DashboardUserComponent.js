@@ -38,7 +38,7 @@ class DashboardUserComponent extends React.Component {
       context: this,
       state: 'outgoing',
     });
-    this.outgoingBind = base.bindToState('totals/' + this.props.user.id + '/balance', {
+    this.balanceBind = base.bindToState('totals/' + this.props.user.id + '/balance', {
       context: this,
       state: 'balance',
     });
@@ -46,6 +46,7 @@ class DashboardUserComponent extends React.Component {
 
   componentWillUnmount() {
     base.removeBinding(this.outgoingBind);
+    base.removeBinding(this.balanceBind);
   }
 
   render() {
