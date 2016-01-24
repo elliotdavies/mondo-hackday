@@ -22,6 +22,7 @@ class DashboardTransactionComponent extends React.Component {
 
     return (
       <li className="dashboardtransaction-component">
+        <span className={'icon icon--' + this.props.transaction.category}></span>
         <h4>{this.props.transaction.description} <small>by {this.props.transaction.name}</small></h4>
         <span className={labelClass}>{currency}{value.toFixed(2)}</span>
       </li>

@@ -72,6 +72,9 @@ class UserComponent extends RequireAuthComponent {
                 <Link to={'user/' + this.state.user.id + '/print'} className="button">
                   <FontAwesome name="print" /> Weekly report
                 </Link>
+                <Link to={'user/' + this.state.user.id + '/' + this.state.user.account.account_id + '/message'} className="button">
+                  <FontAwesome name="commenting" /> Send message in Mondo
+                </Link>
               </div>
             </aside>
           </header>

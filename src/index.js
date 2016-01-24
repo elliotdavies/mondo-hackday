@@ -10,6 +10,7 @@ import Auth from './components/AuthComponent';
 import Login from './components/LoginComponent';
 import Dashboard from './components/DashboardComponent';
 import Print from './components/PrintComponent';
+import UserMessage from './components/UserMessageComponent';
 import NoMatch from './components/ErrorComponent';
 
 // Declarative route configuration (could also load this config lazily
@@ -24,6 +25,7 @@ render((
       <Route path="login" component={Login}/>
       <Route path="dashboard" component={Dashboard}/>
       <Route name="user" path="user/:id" component={User}/>
+      <Route name="message" path="user/:id/:account/message" component={UserMessage}/>
       <Route path="*" component={NoMatch}/>
     </Route>
   </Router>

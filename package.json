@@ -79,6 +79,7 @@
     "react-dom": "^0.14.0",
     "react-fontawesome": "^0.3.3",
     "react-router": "^1.0.3",
-    "reactfire": "^0.5.1"
+    "reactfire": "^0.5.1",
+    "superagent": "^1.7.1"
   }
 }

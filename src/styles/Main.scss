@@ -4,4 +4,17 @@
 
   @import "partials/container";
 
+  form {
+    margin-top: 2em;
+
+    input {
+      display: block;
+      height: 40px;
+      font-size: 1.2em;
+      width: 100%;
+      margin: 0 0 1em;
+      padding: 4px;
+    }
+  }
+
 }
