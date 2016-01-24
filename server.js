@@ -222,9 +222,9 @@ function handleMessage(res, data) {
         type: 'basic',
         'params[title]': data.title,
         'params[body]': data.message,
-        'params[background_color]': '#e6f1e6',
-        // 'params[body_color]': '#FFFFFF",
-        // 'params[title_color]': '#333',
+        'params[background_color]': '#efe6f6',
+        'params[body_color]': '#333',
+        'params[title_color]': '#222',
         'params[image_url]': 'http://i.imgur.com/yxhLTcn.png'
       }
     },
