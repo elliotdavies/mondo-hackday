@@ -123,7 +123,7 @@ function handleAuthCallback(url, res) {
                 });
 
                 // Does this user already have a webhook set up?
-                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.account_number,
+                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.id,
                 {
                   'auth': {
                     'bearer': authBody.access_token
