@@ -333,11 +333,6 @@ function updateTotals(ids) {
       let incoming = transactions.filter(t => t.amount >= 0).reduce((total, t) => { return total + t.amount }, 0);
       let outgoing = transactions.filter(t => t.amount < 0).reduce((total, t) => { return total + t.amount }, 0);
 
-      firebaseTotals.child(id.u_id).set({
-        incoming: incoming,
-        outgoing: Math.abs(outgoing)
-      });
-
       totalIncoming += incoming;
       totalOutgoing += outgoing;
 
@@ -348,6 +343,27 @@ function updateTotals(ids) {
           outgoing: Math.abs(totalOutgoing)
         });
       }
+
+      request.get(
+        `${apiUrl}/balance?account_id=${id.acc_id}`,
+        {
+          'auth': {
+            'bearer': id.token
+          }
+        },
+        function(balErr, balRes, balBody) {
+          if (balErr) {
+            console.log('Error fetching balance:', balErr);
+            return;
+          }
+
+          let balance = JSON.parse(balBody).balance;
+          firebaseTotals.child(id.u_id).set({
+            incoming: incoming,
+            outgoing: Math.abs(outgoing),
+            balance: balance
+          });
+        });
     });
   });
 }
