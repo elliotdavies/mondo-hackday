@@ -122,6 +122,12 @@ function handleAuthCallback(url, res) {
                   },
                   name: '',
                   email: ''
+                }, function(setErr){
+                  if (setErr) console.log('Error saving new user data');
+                  else  fetchUserIds(ids => {
+                          updateTotals(ids);
+                          updateRecentTransactions(ids);
+                        });
                 });
 
                 // Does this user already have a webhook set up?
