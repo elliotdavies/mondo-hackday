@@ -192,6 +192,52 @@ function handleWebhook(args) {
 
 
 /**
+ * Messages to pass along to a user
+ */
+function handleMessage(res, data) {
+  console.log('Received message data');
+
+  data = JSON.parse(Object.keys(data)[0]);
+
+  firebaseUsers.once('value', function(users){
+    users = users.val();
+
+    let userToken = (Object.keys(users))
+      .filter(u => users[u].account.account_id == data.accountId)
+      .map(u => users[u].access_token)[0];
+
+    request.post({
+      url: `${apiUrl}/feed`,
+      'auth': {
+        'bearer': userToken
+      },
+      form: {
+        account_id: data.accountId,
+        type: 'basic',
+        'params[title]': data.title,
+        'params[body]': data.message,
+        // 'params[background_color]': '#FCF1EE',
+        // 'params[body_color]': '#FFFFFF",
+        // 'params[title_color]': '#333',
+        'params[image_url]': 'http://www.nyan.cat/cats/original.gif'
+      }
+    },
+    function(err, MondoRes, MondoData){
+      if (!err && MondoRes.statusCode === 200) {
+        console.log('Successfully posted to user\'s feed');
+        res.writeHead(200, {'Content-Type':'text/plain'});
+        res.end('Success');
+      } else {
+        console.log('Error posting to user\'s feed');
+        res.writeHead(418, {'Content-Type':'text/plain'});
+        res.end('Fail');
+      }
+    });
+  });
+}
+
+
+/**
  * Fetch all user IDs currently stored in the database
  */
 function fetchUserIds(fn) {
@@ -364,6 +410,9 @@ let server = http.createServer(function(req, res){
 
       // Then redirect
       switch (url.pathname) {
+        case '/message':
+          handleMessage(res, args);
+          break;
         // Incoming webhooks
         case '/webhook':
           handleWebhook(args);
