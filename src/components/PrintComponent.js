@@ -46,6 +46,11 @@ class PrintComponent extends RequireAuthComponent {
     });
   }
 
+  componentWillUnmount() {
+    this.base.removeBinding(this.outgoingBind);
+    this.base.removeBinding(this.userTransactionsBind);
+  }
+
   render() {
     if(this.state.user && this.state.outgoing) {
       return (
