@@ -55,6 +55,7 @@ class UserMessageComponent extends RequireAuthComponent {
       .post('http://' + config.server + ':' + config.port + '/message')
       .send(data)
       .set('Accept', 'application/json')
+      .set('Content-Type', 'application/json')
       .end(function(err, res){
         console.error(err);
         console.log(res);
