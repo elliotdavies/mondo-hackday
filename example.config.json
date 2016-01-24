@@ -1,0 +1,12 @@
+{
+  "client_id": "",
+  "client_secret": "",
+  "server": "localhost",
+  "port": 8080,
+  "database": "",
+  "staging_auth_url": "https://staging-auth.getmondo.co.uk",
+  "auth_url": "https://auth.getmondo.co.uk",
+  "staging_api_url": "https://staging-api.getmondo.co.uk",
+  "api_url": "https://api.getmondo.co.uk",
+  "is_prod": true
+}
