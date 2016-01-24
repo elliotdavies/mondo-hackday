@@ -85,7 +85,6 @@ function handleAuthCallback(url, res) {
     function(authErr, authRes, authBody){
       if (authErr) console.log('ERROR: ' + authErr);
       else {
-        console.log('authbody', authBody)
         authBody = JSON.parse(authBody);
 
         // Fetch the user's account ID
@@ -97,7 +96,6 @@ function handleAuthCallback(url, res) {
             }
           },
           function(accErr, accRes, accBody) {
-            console.log(accErr)
             accBody = (JSON.parse(accBody)).accounts[0];
 
             // Check if user already exists in the database
