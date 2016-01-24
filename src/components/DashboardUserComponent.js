@@ -44,16 +44,17 @@ class DashboardUserComponent extends React.Component {
   }
 
   render() {
-    console.log(this.state.outgoing);
-
     return (
       <li className="dashboard__user">
-        <LazyImage src={this.getGravatar(this.props.user.email, 150)} />
         <div className="user__meta">
+          <LazyImage src={this.getGravatar(this.props.user.email, 150)} />
           <h2>{this.props.user.name}</h2>
           <p>{this.props.user.email}</p>
         </div>
-        <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
+        <div className="user__finances">
+          <Link to={'user/' + this.props.user.id} className="button">Weekly spend of £{(this.state.outgoing * 1/100).toFixed(2)}</Link>
+          <h3>£123.04 remaining</h3>
+        </div>
       </li>
     );
   }

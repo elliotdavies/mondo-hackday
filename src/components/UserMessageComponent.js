@@ -16,7 +16,8 @@ class UserMessageComponent extends RequireAuthComponent {
     this.state = {
       transactions: [],
       outgoing: false,
-      user: false
+      user: false,
+      error: true
     }
   }
 
@@ -36,11 +37,6 @@ class UserMessageComponent extends RequireAuthComponent {
     });
   }
 
-  componentWillUnmount() {
-    this.base.removeBinding(this.outgoingBind);
-    this.base.removeBinding(this.userTransactionsBind);
-  }
-
   submitData(event) {
     let data = {
       title: event.target.title.value,
@@ -56,18 +52,28 @@ class UserMessageComponent extends RequireAuthComponent {
       .send(data)
       .set('Accept', 'application/json')
       .end(function(err, res){
-        console.error(err);
-        console.log(res);
-      });
+        if(err) {
+          this.state.error = true;
+        }
+
+        window.location.href = '/#/user/' + this.props.params.id;
+      }.bind(this));
   }
 
   render() {
+    let error;
+    if(this.state.error) {
+      error = (<div className="alert alert--danger">Unable to send message, please try again.</div>);
+    }
+
     if(this.state.user) {
       return (
         <div className="usermessage-component">
 
           <h2>Send message to {this.state.user.name}</h2>
           <p>This will show up in their Mondo feed</p>
+
+          {error}
 
           <form ref="form" onSubmit={this.submitData.bind(this)}>
 

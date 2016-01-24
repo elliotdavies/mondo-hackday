@@ -7,6 +7,7 @@
 
     .dashboard__user {
       display: flex;
+      justify-content: space-between;
       letter-spacing: normal;
       width: 100%;
       margin: 0 0 1em;
@@ -28,11 +29,25 @@
         max-width: 75px;
         max-height: 75px;
         margin: 0 0.67em 0 0;
+        float: left;
       }
 
       .button {
         margin-left: auto;
         align-self: flex-start;
+      }
+
+      .user__meta {
+        width: 50%;
+      }
+
+      .user__finances {
+        text-align: right;
+
+        h3 {
+          display: block;
+          margin-top: 1em;
+        }
       }
     }
 
