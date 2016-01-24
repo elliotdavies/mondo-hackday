@@ -1,0 +1,49 @@
+.print-component {
+  background: #FFFFFF;
+  min-height: 100%;
+
+  .print__container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 3em 1em;
+
+    header {
+      aside {
+        span.print__date {
+          font-weight: bold;
+          margin: 0 0 0.3em;
+        }
+      }
+    }
+
+    main {
+      margin: 3em 0;
+
+      h2 {
+        &:first-of-type {
+          margin-bottom: 2em;
+        }
+      }
+    }
+
+    .user__transactions {
+      margin: 0;
+      padding: 0;
+
+      .usertransaction-component {
+        padding: 10px;
+        margin: 0 0 2em;
+        border: 1px solid #6a6a6a;
+
+        .transaction__meta {
+          width: 100%;
+        }
+
+        .transaction__actions {
+          display: none;
+        }
+      }
+    }
+  }
+}
