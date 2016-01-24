@@ -91,3 +91,85 @@ button+button {
 .label.label--positive.label--money:before {
   content: '+ ';
 }
+
+blockquote, .blockquote {
+  border-left: 3px solid #8a8a8a;
+  margin: 2em 0 2em;
+  padding: 0.5em 0 0.5em 1em;
+}
+
+.icon {
+  display: inline-block;
+  float: left;
+  margin: 0 5px 5px 0;
+  background: #dadada;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  color: #FFFFFF;
+  text-align: center;
+  line-height: 35px;
+  font:normal normal normal 14px/1 FontAwesome;font-size:inherit;text-rendering:auto;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+}
+
+.icon:before {
+  line-height: 35px;
+}
+
+.icon.icon--mondo {
+  background: #13223D;
+  background-image: url(../images/mondo-icon.png);
+  background-size: 14px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.icon.icon--mondo:before {
+}
+.icon.icon--transport {
+  background: #16788D;
+}
+.icon.icon--transport:before {
+  content: "\f1b9";
+}
+.icon.icon--groceries {
+  background: #EBD29C;
+}
+.icon.icon--groceries:before {
+  content: "\f291";
+}
+.icon.icon--eating_out {
+  background: #E8495C;
+}
+.icon.icon--eating_out:before {
+  content: "\f0f5";
+}
+.icon.icon--cash {
+  background: #99BDA9;
+}
+.icon.icon--cash:before {
+  content: "\f0d6";
+}
+.icon.icon--bills {
+  background: #43B7E0;
+}
+.icon.icon--bills:before {
+  content: "\f0eb";
+}
+.icon.icon--entertainment {
+  background: #EDB622;
+}
+.icon.icon--entertainment:before {
+  content: "\f118";
+}
+.icon.icon--shopping {
+  background: #F96172;
+}
+.icon.icon--shopping:before {
+  content: "\f290";
+}
+.icon.icon--holidays {
+  background: #3F103E;
+}
+.icon.icon--holidays:before {
+  content: "\f0f2";
+}

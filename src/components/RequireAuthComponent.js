@@ -17,6 +17,8 @@ class RequireAuthComponent extends React.Component {
   constructor(props) {
     super(props);
 
+    this.base = base;
+
     let login = localStorage.getItem('auth');
 
     // No login data? Go to login.

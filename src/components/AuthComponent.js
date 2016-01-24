@@ -66,29 +66,36 @@ class AuthComponent extends React.Component {
 
     let stateKey = this.state.auth.key;
 
+    let sentName = false;
+    let sentEmail = false;
+
     base.post('users/' + stateKey + '/name', {
       data: data.name,
       then(){
-
-        base.post('users/' + stateKey + '/email', {
-          data: data.email,
-          then(){
-
-            let authData = {
-              id: this.state.auth.id,
-              accountId: this.state.auth.account.account_id,
-              name: this.state.auth.name,
-              email: this.state.auth.email
-            };
-
-            window.localStorage.setItem('auth', JSON.stringify(authData));
-            window.location.href = '/#/dashboard';
-
-          }
-        });
-
+        sentName = true;
       }
     });
+
+    base.post('users/' + stateKey + '/email', {
+      data: data.email,
+      then(){
+        sentEmail = true;
+      }
+    });
+
+    setTimeout(() => {
+      if(sentName && sentEmail) {
+        let authData = {
+          id: this.state.auth.id,
+          accountId: this.state.auth.account.account_id,
+          name: this.state.auth.name,
+          email: this.state.auth.email
+        };
+
+        window.localStorage.setItem('auth', JSON.stringify(authData));
+        window.location.href = '/#/dashboard';
+      }
+    }, 50);
   }
 
   handleChange(event) {

@@ -9,6 +9,7 @@ import User from './components/UserComponent';
 import Auth from './components/AuthComponent';
 import Login from './components/LoginComponent';
 import Dashboard from './components/DashboardComponent';
+import Print from './components/PrintComponent';
 import NoMatch from './components/ErrorComponent';
 
 // Declarative route configuration (could also load this config lazily
@@ -16,6 +17,8 @@ import NoMatch from './components/ErrorComponent';
 // colocate the entire config).
 render((
   <Router onUpdate={() => window.scrollTo(0, 0)}>
+    <Route name="print" path="user/:id/print" component={Print}/>
+
     <Route path="/" component={App}>
       <Route path="auth/:user" component={Auth}/>
       <Route path="login" component={Login}/>
