@@ -36,7 +36,7 @@ class AuthComponent extends React.Component {
           auth: data[0]
         });
 
-        if(typeof data[0].email !== 'undefined') {
+        if(data[0].email !== '' && data[0].name !== '') {
           let authData = {
             id: data[0].id,
             accountId: data[0].account.account_id,
@@ -49,7 +49,7 @@ class AuthComponent extends React.Component {
           return;
         }
 
-        if(typeof data[0].account.desc !== 'undefined') {
+        if(data[0].name === '') {
           this.setState({
             name: data[0].account.desc
           });
