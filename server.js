@@ -12,6 +12,8 @@ const clientId = config.client_id;
 const clientSecret = config.client_secret
 const port = config.port;
 const path = config.server;
+const authUrl = ((config.is_prod) ? config.auth_url : config.staging_auth_url);
+const apiUrl = ((config.is_prod) ? config.api_url : config.staging_api_url);
 
 // Firebase database
 const Firebase = require("firebase");
@@ -48,7 +50,7 @@ function parseArgs(data) {
  */
 function handleAuth(res) {
   console.log('User visited /auth - redirecting to Mondo...');
-  const mondoAuthUrl = `https://auth.getmondo.co.uk/?client_id=${clientId}&redirect_uri=${redirectUriBase}/auth/callback&response_type=code&state=${state}`;
+  const mondoAuthUrl = `${authUrl}/?client_id=${clientId}&redirect_uri=${redirectUriBase}/auth/callback&response_type=code&state=${state}`;
   res.writeHead(302, {
     'Location': mondoAuthUrl
   });
@@ -67,7 +69,7 @@ function handleAuthCallback(url, res) {
   if (args.state === state) {
     console.log('Redirecting to Mondo again...');
 
-    const mondoAuthUrl2Host = 'https://api.getmondo.co.uk/oauth2/token';
+    const mondoAuthUrl2Host = `${apiUrl}/oauth2/token`;
 
     // Fire off data to Mondo
     request.post({
@@ -83,17 +85,19 @@ function handleAuthCallback(url, res) {
     function(authErr, authRes, authBody){
       if (authErr) console.log('ERROR: ' + authErr);
       else {
+        console.log('authbody', authBody)
         authBody = JSON.parse(authBody);
 
         // Fetch the user's account ID
         request.get(
-          'https://api.getmondo.co.uk/accounts',
+          `${apiUrl}/accounts`,
           {
             'auth': {
               'bearer': authBody.access_token
             }
           },
           function(accErr, accRes, accBody) {
+            console.log(accErr)
             accBody = (JSON.parse(accBody)).accounts[0];
 
             // Check if user already exists in the database
@@ -123,7 +127,7 @@ function handleAuthCallback(url, res) {
                 });
 
                 // Does this user already have a webhook set up?
-                request('https://api.getmondo.co.uk/webhooks?account_id=' + accBody.id,
+                request(`${apiUrl}/webhooks?account_id=${accBody.id}`,
                 {
                   'auth': {
                     'bearer': authBody.access_token
@@ -144,7 +148,7 @@ function handleAuthCallback(url, res) {
 
                   // If not, create one
                   request.post({
-                    url: 'https://api.getmondo.co.uk/webhooks',
+                    url: `${apiUrl}/webhooks`,
                     'auth': {
                       'bearer': authBody.access_token
                     },
@@ -218,7 +222,7 @@ function updateRecentTransactions(ids) {
   let teamTransactions = [];
 
   ids.forEach(id => {
-    request(`https://api.getmondo.co.uk/transactions?account_id=${id.acc_id}&limit=10`,
+    request(`${apiUrl}/transactions?account_id=${id.acc_id}&limit=10`,
     {
       'auth': {
         'bearer': id.token
@@ -267,7 +271,7 @@ function updateTotals(ids) {
   let weekAgoStr = weekAgo.toISOString();
 
   ids.forEach(id => {
-    request(`https://api.getmondo.co.uk/transactions?account_id=${id.acc_id}&since=${weekAgoStr}`,
+    request(`${apiUrl}/transactions?account_id=${id.acc_id}&since=${weekAgoStr}`,
     {
       'auth': {
         'bearer': id.token
